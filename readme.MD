@@ -41,3 +41,17 @@ Root: 4 Size: 10 Level: 5
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ 9 _ 
 ================================
 ```
+
+No self balancing also means the performance degrades to a linked list
+```
+worseTree := bst.NewFromArray([]int{1, 2, 3, 4, 5})
+worseTree.PrintSubtreeLevelOrder()
+
+Root: 1 Size: 5 Level: 5
+               1 
+              _ 2 
+            _ _ _ 3 
+        _ _ _ _ _ _ _ 4 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 5 
+================================
+```

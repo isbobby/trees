@@ -14,4 +14,7 @@ func main() {
 	myTree.Insert(-2)
 	myTree.Insert(9)
 	myTree.PrintSubtreeLevelOrder()
+
+	worseTree := bst.NewFromArray([]int{1, 2, 3, 4, 5})
+	worseTree.PrintSubtreeLevelOrder()
 }
