@@ -17,10 +17,11 @@ func (root *Node) PrintSubtreeLevelOrder() {
 	res := []string{}
 	queue := []*Node{root}
 	level := 1
-
+	hasNode := true
 	for len(queue) > 0 {
 		i := 0
 		currLevel := []byte{}
+		hasNode = false
 		for i < level && len(queue) > 0 {
 			top := queue[0]
 			queue = queue[1:]
@@ -29,8 +30,12 @@ func (root *Node) PrintSubtreeLevelOrder() {
 			i++
 
 			if top != nil {
+				hasNode = true
 				queue = append(queue, top.left)
 				queue = append(queue, top.right)
+			} else {
+				queue = append(queue, nil)
+				queue = append(queue, nil)
 			}
 		}
 
@@ -40,8 +45,12 @@ func (root *Node) PrintSubtreeLevelOrder() {
 			i++
 		}
 
-		level = level << 1
-		res = append(res, string(currLevel))
+		if hasNode {
+			level = level << 1
+			res = append(res, string(currLevel))
+		} else {
+			break
+		}
 	}
 
 	fmt.Println("Root:", root.val, "Size:", root.Size(), "Level:", math.Log2(float64(level)))
