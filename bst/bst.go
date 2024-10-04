@@ -25,6 +25,7 @@ type BinarySearchTree interface {
 	Left() (*Node, error)
 	Right() (*Node, error)
 	Val() (int, error)
+	PrintSubtreeLevelOrder()
 }
 
 func (root *Node) Val() (int, error) {
