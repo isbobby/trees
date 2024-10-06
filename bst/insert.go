@@ -19,6 +19,8 @@ func (root *Node) Insert(val int) (*Node, error) {
 	if val > root.val {
 		if root.right == nil {
 			root.right = &newNode
+			newNode.parent = root
+
 			root.right.incrementSize()
 			root.incrementSize()
 			return root.right, nil
@@ -32,6 +34,8 @@ func (root *Node) Insert(val int) (*Node, error) {
 	} else {
 		if root.left == nil {
 			root.left = &newNode
+			newNode.parent = root
+
 			root.left.incrementSize()
 			root.incrementSize()
 			return root.left, nil

@@ -5,66 +5,169 @@ import (
 	"math"
 )
 
+func (root *Node) PrintNodeInfo() {
+	if root == nil {
+		fmt.Println("Node is NIL")
+		return
+	}
+
+	nodeInfo := NodeInfo{
+		Val:     root.val,
+		Deleted: root.deleted,
+	}
+
+	if root.right != nil {
+		nodeInfo.Right = root.right
+	}
+
+	if root.left != nil {
+		nodeInfo.Left = root.left
+	}
+
+	if root.parent != nil {
+		nodeInfo.Parent = root.parent
+	}
+	fmt.Println(nodeInfo)
+}
+
+func (n NodeInfo) String() string {
+	v := []byte(fmt.Sprint(n.Val))
+	p, l, r, del := []byte("_"), []byte("_"), []byte("_"), []byte("X")
+	if n.Parent != nil {
+		if n.Parent.deleted {
+			p = []byte(del)
+		} else {
+			p = []byte(fmt.Sprint(n.Parent.val))
+		}
+	}
+	if n.Left != nil {
+		if n.Left.deleted {
+			l = []byte(del)
+		} else {
+			l = []byte(fmt.Sprint(n.Left.val))
+		}
+	}
+	if n.Right != nil {
+		if n.Right.deleted {
+			r = []byte(del)
+		} else {
+			r = []byte(fmt.Sprint(n.Right.val))
+		}
+	}
+
+	return fmt.Sprintf("  %v  \n  |\n  %v\n / \\\n%v   %v\n",
+		string(p), string(v), string(l), string(r))
+}
+
 func (root *Node) PrintSubtreeLevelOrder() {
 	if root == nil {
 		fmt.Println("Empty Tree")
 		return
 	}
 
-	whitespaces := []byte(" ")
+	// whitespaces := []byte(" ")
 	nilString := []byte("_")
 
-	res := []string{}
+	elements := [][][]byte{}
 	queue := []*Node{root}
 	level := 1
+	elementLength := 1
 	hasNode := true
-	for len(queue) > 0 {
+	for len(queue) > 0 && hasNode {
 		i := 0
-		currLevel := []byte{}
+		currLevelElements := [][]byte{}
 		hasNode = false
 		for i < level && len(queue) > 0 {
 			top := queue[0]
 			queue = queue[1:]
-			currLevel = append(currLevel, []byte(top.String())...)
-			currLevel = append(currLevel, whitespaces...)
-			i++
+			currElement := []byte(top.String())
+			currLevelElements = append(currLevelElements, currElement)
+			if len(currElement) > elementLength {
+				elementLength = len(currElement)
+			}
 
 			if top != nil {
 				hasNode = true
-				queue = append(queue, top.left)
-				queue = append(queue, top.right)
+				queue = append(queue, top.left, top.right)
 			} else {
-				queue = append(queue, nil)
-				queue = append(queue, nil)
+				queue = append(queue, nil, nil)
 			}
+			i++
 		}
 
 		for i < level {
-			currLevel = append(currLevel, nilString...)
-			currLevel = append(currLevel, whitespaces...)
+			currLevelElements = append(currLevelElements, nilString)
 			i++
 		}
 
 		if hasNode {
 			level = level << 1
-			res = append(res, string(currLevel))
-		} else {
-			break
+			elements = append(elements, currLevelElements)
 		}
 	}
 
 	fmt.Println("Root:", root.val, "Size:", root.Size(), "Level:", math.Log2(float64(level)))
-	for i := range res {
-		toPrint := []byte{}
-		for j := 0; j < (level-len(res[i]))/2; j++ {
-			toPrint = append(toPrint, []byte(" ")...)
+	leadingSpace := 0
+	spacedElements := [][]byte{}
+	for i := len(elements) - 1; i >= 0; i-- {
+		k := len(elements) - i
+		gapBetweenNodes := (int(math.Pow(2.0, float64(k))) - 1) * elementLength
+
+		spacedElementsAtLevel := []byte{}
+
+		// append leading space
+		for j := 0; j < leadingSpace; j++ {
+			spacedElementsAtLevel = append(spacedElementsAtLevel, ' ')
 		}
-		toPrint = append(toPrint, res[i]...)
-		fmt.Println(string(toPrint))
+
+		// create gap
+		gap := []byte{}
+		for j := 0; j < gapBetweenNodes; j++ {
+			gap = append(gap, ' ')
+		}
+
+		elementsAtLevel := elements[i]
+		for _, element := range elementsAtLevel {
+			spacedElementsAtLevel = append(spacedElementsAtLevel, fillElement(element, elementLength)...)
+			spacedElementsAtLevel = append(spacedElementsAtLevel, gap...)
+		}
+
+		spacedElements = append(spacedElements, spacedElementsAtLevel)
+		leadingSpace = gapBetweenNodes
 	}
+
+	for i := len(spacedElements) - 1; i >= 0; i-- {
+		fmt.Println(string(spacedElements[i]))
+	}
+
 	line := []byte{}
-	for i := 0; i < level; i++ {
+	for i := 0; i < len(spacedElements[0]); i++ {
 		line = append(line, '=')
 	}
 	fmt.Println(string(line))
+}
+
+func fillElement(element []byte, requiredLength int) []byte {
+	if len(element) >= requiredLength {
+		return element
+	}
+
+	diff := requiredLength - len(element)
+
+	half := float64(diff) / 2
+	left, right := math.Ceil(half), math.Floor(half)
+	leadingSpace, endingSpace := []byte{}, []byte{}
+	for i := 0; i < int(left); i++ {
+		leadingSpace = append(leadingSpace, ' ')
+	}
+
+	for i := 0; i < int(right); i++ {
+		endingSpace = append(endingSpace, ' ')
+	}
+
+	spacedElement := leadingSpace
+	spacedElement = append(leadingSpace, element...)
+	spacedElement = append(spacedElement, endingSpace...)
+
+	return spacedElement
 }

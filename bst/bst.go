@@ -3,10 +3,20 @@ package bst
 import "errors"
 
 type Node struct {
-	val     int
+	val int
+
 	deleted bool
+	parent  *Node
 	left    *Node
 	right   *Node
+}
+
+type NodeInfo struct {
+	Val     int
+	Deleted bool
+	Parent  *Node
+	Left    *Node
+	Right   *Node
 }
 
 var (
@@ -20,12 +30,13 @@ type BinarySearchTree interface {
 	Insert(val int) (*Node, error)
 	Find(Val int) (*Node, error)
 	SoftDelete(val int) error
-	HardDelete(val int) error
+	HardDelete(val int) (*Node, error)
 
 	Left() (*Node, error)
 	Right() (*Node, error)
 	Val() (int, error)
 	PrintSubtreeLevelOrder()
+	PrintNodeInfo()
 }
 
 func (root *Node) Val() (int, error) {

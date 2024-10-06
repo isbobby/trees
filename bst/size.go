@@ -11,3 +11,7 @@ func (root *Node) Size() int {
 func (root *Node) incrementSize() {
 	nodeSize[root] += 1
 }
+
+func (root *Node) incrementSizeBy(i int) {
+	nodeSize[root] += i
+}
