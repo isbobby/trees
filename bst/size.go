@@ -12,6 +12,9 @@ func (root *Node) incrementSize() {
 	nodeSize[root] += 1
 }
 
-func (root *Node) incrementSizeBy(i int) {
-	nodeSize[root] += i
+func (root *Node) decrementSize() {
+	nodeSize[root] -= 1
+	if nodeSize[root] == 0 {
+		delete(nodeSize, root)
+	}
 }

@@ -2,7 +2,7 @@ package bst
 
 func (root *Node) Insert(val int) (*Node, error) {
 	if root == nil {
-		return nil, ErrRootIsNil
+		return nil, ErrInsertToEmptyTree
 	}
 
 	if val == root.val {

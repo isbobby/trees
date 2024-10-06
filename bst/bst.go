@@ -23,6 +23,7 @@ var (
 	ErrNodeAlreadyExists = errors.New("failed to insert node, node already in sub-tree")
 	ErrNodeNotFound      = errors.New("failed to find node in sub-tree")
 	ErrRootIsNil         = errors.New("cannot perform operation on nil root")
+	ErrInsertToEmptyTree = errors.New("cannot insert to empty root, create new root with New(), or NewFromArray()")
 )
 
 type BinarySearchTree interface {

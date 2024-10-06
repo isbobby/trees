@@ -1,70 +1,82 @@
 package bst
 
-import "fmt"
-
 func (root *Node) HardDelete(val int) (*Node, error) {
-	toDelete, err := root.binarySearchFromRoot(val)
+	delPath, err := root.pathFromRoot(val)
 	if err != nil {
 		return nil, err
 	}
-	if toDelete == nil {
-		return nil, ErrRootIsNil
-	}
-	fmt.Println("deleting", toDelete)
-	var newSubtreeNode *Node
-	if toDelete.right != nil {
-		newSubtreeNode = toDelete.promoteRight()
-	} else {
-		newSubtreeNode = toDelete.promoteLeft()
-	}
-
-	if toDelete.parent != nil {
-		if toDelete.val > toDelete.parent.val {
-			toDelete.parent.right = newSubtreeNode
-		} else {
-			toDelete.parent.left = newSubtreeNode
+	var decrementSizeOnPath = func(nodes []*Node) {
+		for _, node := range nodes {
+			node.decrementSize()
 		}
-		toDelete.parent = nil
 	}
+	decrementSizeOnPath(delPath)
+
+	toDelete := delPath[len(delPath)-1]
+	if toDelete.isLeaf() {
+		if toDelete.parent == nil {
+			return nil, nil
+		} else {
+			if toDelete.val > toDelete.parent.val {
+				toDelete.parent.right = nil
+			} else {
+				toDelete.parent.left = nil
+			}
+			toDelete.parent = nil
+		}
+	}
+
+	newTreeRoot := toDelete.getRoot()
+	if toDelete.right != nil && toDelete.left != nil {
+		successorPath := toDelete.popSuccessor()
+		decrementSizeOnPath(successorPath)
+		successor := successorPath[len(successorPath)-1]
+
+		if successor.val > successor.parent.val {
+			successor.parent.right = successor.right
+		} else {
+			successor.parent.left = successor.right
+		}
+		toDelete.val = successor.val
+		successor.parent = nil
+		return toDelete.getRoot(), nil
+	} else if toDelete.right != nil {
+		if toDelete.parent != nil {
+			if toDelete.val > toDelete.parent.val {
+				toDelete.parent.right = toDelete.right
+			} else {
+				toDelete.parent.left = toDelete.right
+			}
+		} else {
+			newTreeRoot = toDelete.right
+		}
+	} else {
+		if toDelete.parent != nil {
+
+			if toDelete.val > toDelete.parent.val {
+				toDelete.parent.right = toDelete.left
+			} else {
+				toDelete.parent.left = toDelete.left
+			}
+		} else {
+			newTreeRoot = toDelete.right
+		}
+	}
+	toDelete.parent = nil
 	delete(nodeSize, toDelete)
-	fmt.Println("GOT newSubTreeNode", newSubtreeNode)
-	newSubtreeNode.PrintNodeInfo()
-	fmt.Println(nodeSize)
-	return newSubtreeNode.getRoot(), nil
+	return newTreeRoot, nil
 }
 
-func (root *Node) promoteRight() *Node {
-	fmt.Println("Promote right child", root.right)
-	currLeft := root.left
-	newRoot := root.right
-
-	newRootLeft := root.right.left
-	newRootLeftMostLeaf := newRootLeft
-	leftPath := []*Node{newRootLeftMostLeaf}
-	for newRootLeftMostLeaf.left != nil {
-		newRootLeftMostLeaf = newRootLeft.left
-		leftPath = append(leftPath, newRootLeftMostLeaf)
+func (root *Node) popSuccessor() []*Node {
+	path := []*Node{}
+	root = root.right
+	path = append(path, root)
+	for root.left != nil {
+		root = root.left
+		path = append(path, root)
 	}
 
-	newRootLeftMostLeaf.left = currLeft
-	currLeft.parent = newRootLeftMostLeaf
-	newRoot.parent = nil
-	fmt.Println(leftPath)
-	for len(leftPath) > 0 {
-		node := leftPath[len(leftPath)-1]
-		leftPath = leftPath[:len(leftPath)-1]
-		fmt.Println("increment size for", node)
-		node.incrementSizeBy(currLeft.Size())
-	}
-	newRoot.incrementSizeBy(currLeft.Size())
-	fmt.Println("Return promoted", newRoot)
-
-	return newRoot
-}
-
-func (root *Node) promoteLeft() *Node {
-	fmt.Println("Promote left child", root.left)
-	return nil
+	return path
 }
 
 func (root *Node) SoftDelete(val int) error {

@@ -78,3 +78,34 @@ Root: 1 Size: 5 Level: 5
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 5 
 ================================
 ```
+
+`HardDelete(x)` will remove a node from the tree, change its structure and update the size metadata.
+```
+myTree.PrintSubtreeLevelOrder()
+
+myTree, _ = myTree.HardDelete(7)
+myTree.PrintSubtreeLevelOrder()
+
+myTree, _ = myTree.HardDelete(4)
+myTree.PrintSubtreeLevelOrder()
+
+// output
+Root: 4 Size: 9 Level: 4
+       4               
+   1       7       
+ X   2   6   8   
+_ _ _ 3 _ _ _ 9 
+================
+Root: 4 Size: 8 Level: 4
+       4               
+   1       8       
+ X   2   6   9   
+_ _ _ 3 _ _ _ _ 
+================
+Root: 6 Size: 7 Level: 4
+       6               
+   1       8       
+ X   2   _   9   
+_ _ _ 3 _ _ _ _ 
+================
+```

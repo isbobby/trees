@@ -21,7 +21,12 @@ func main() {
 	fmt.Println(err)
 	myTree.PrintSubtreeLevelOrder()
 
+	myTree, _ = myTree.HardDelete(7)
+	myTree.PrintSubtreeLevelOrder()
+
+	myTree, _ = myTree.HardDelete(4)
+	myTree.PrintSubtreeLevelOrder()
+
 	worseTree := bst.NewFromArray([]int{1, 2, 3, 4, 5})
 	worseTree.PrintSubtreeLevelOrder()
-
 }
